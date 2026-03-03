@@ -1,0 +1,17 @@
+{
+    "schemaVersion": 1,
+    "updatedAt": "2026-03-03T00:00:00Z",
+    "plugins": [
+        {
+            "name": "HelloWorld",
+            "description": "A sample remote plugin that shows a notification on start and adds a toolbox action.",
+            "version": "1.0.0",
+            "authors": ["Zan"],
+            "downloadUrl": "https://plugins.zanverse.lol/bundles/HelloWorld.js",
+            "hash": "599ad7a8728f7e406195cadf9f2ceb53756087c636f901bb5e4a1fb90770e661",
+            "tags": ["sample", "hello", "demo"],
+            "sourceUrl": "https://github.com/zanfiel/Zancord/blob/main/remote-plugins/HelloWorld.js",
+            "changelog": "Initial release"
+        }
+    ]
+}

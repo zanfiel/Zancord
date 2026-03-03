@@ -5,13 +5,14 @@
  */
 
 import { definePluginSettings } from "@api/Settings";
-import { BackupRestoreIcon, CloudIcon, LogIcon, MainSettingsIcon, PaintbrushIcon, PatchHelperIcon, PluginsIcon, UpdaterIcon } from "@components/Icons";
+import { BackupRestoreIcon, CloudIcon, LogIcon, MainSettingsIcon, PaintbrushIcon, PatchHelperIcon, PluginsIcon, RemotePluginsIcon, UpdaterIcon } from "@components/Icons";
 import {
     BackupAndRestoreTab,
     ChangelogTab,
     CloudTab,
     PatchHelperTab,
     PluginsTab,
+    RemotePluginsTab,
     ThemesTab,
     UpdaterTab,
     VencordTab,
@@ -106,6 +107,7 @@ const settings = definePluginSettings({
 const settingsSectionMap: [string, string][] = [
     ["ZancordSettings", "Zancord_main_panel"],
     ["zancordplugins", "Zancord_plugins_panel"],
+    ["ZancordRemotePlugins", "Zancord_remote_plugins_panel"],
     ["ZancordThemes", "Zancord_themes_panel"],
     ["ZancordUpdater", "Zancord_updater_panel"],
     ["ZancordChangelog", "Zancord_changelog_panel"],
@@ -224,6 +226,12 @@ export default definePlugin({
                 title: "Plugins",
                 Component: PluginsTab,
                 Icon: PluginsIcon
+            }),
+            buildEntry({
+                key: "Zancord_remote_plugins",
+                title: "Remote Plugins",
+                Component: RemotePluginsTab,
+                Icon: RemotePluginsIcon
             }),
             buildEntry({
                 key: "Zancord_themes",

@@ -20,6 +20,7 @@ import "./styles.css";
 
 import * as DataStore from "@api/DataStore";
 import { isPluginEnabled, stopPlugin } from "@api/PluginManager";
+import { isRemotePlugin } from "@api/RemotePlugins";
 import { useSettings } from "@api/Settings";
 import { Button } from "@components/Button";
 import { Card } from "@components/Card";
@@ -103,6 +104,7 @@ const enum SearchStatus {
     Zancord,
     VENCORD,
     NEW,
+    REMOTE,
     USER_PLUGINS,
     API_PLUGINS
 }
@@ -223,13 +225,16 @@ export default function PluginSettings() {
                 if (!enabled) return false;
                 break;
             case SearchStatus.Zancord:
-                if (!PluginMeta[plugin.name].folderName.startsWith("src/zancordplugins/")) return false;
+                if (!PluginMeta[plugin.name]?.folderName?.startsWith("src/zancordplugins/")) return false;
                 break;
             case SearchStatus.VENCORD:
-                if (!PluginMeta[plugin.name].folderName.startsWith("src/plugins/")) return false;
+                if (!PluginMeta[plugin.name]?.folderName?.startsWith("src/plugins/")) return false;
                 break;
             case SearchStatus.NEW:
                 if (!newPluginsSet?.has(plugin.name)) return false;
+                break;
+            case SearchStatus.REMOTE:
+                if (!isRemotePlugin(plugin.name)) return false;
                 break;
             case SearchStatus.USER_PLUGINS:
                 if (!PluginMeta[plugin.name]?.userPlugin) return false;
@@ -360,10 +365,10 @@ export default function PluginSettings() {
         const totalPlugins = Object.keys(Plugins).filter(p => !isApiPlugin(p));
         const enabledPlugins = Object.keys(Plugins).filter(p => isPluginEnabled(p) && !isApiPlugin(p));
 
-        const totalStockPlugins = totalPlugins.filter(p => !PluginMeta[p].userPlugin && !Plugins[p].hidden).length;
-        const totalUserPlugins = totalPlugins.filter(p => PluginMeta[p].userPlugin).length;
-        const enabledStockPlugins = enabledPlugins.filter(p => !PluginMeta[p].userPlugin).length;
-        const enabledUserPlugins = enabledPlugins.filter(p => PluginMeta[p].userPlugin).length;
+        const totalStockPlugins = totalPlugins.filter(p => !PluginMeta[p]?.userPlugin && !Plugins[p].hidden).length;
+        const totalUserPlugins = totalPlugins.filter(p => PluginMeta[p]?.userPlugin).length;
+        const enabledStockPlugins = enabledPlugins.filter(p => !PluginMeta[p]?.userPlugin).length;
+        const enabledUserPlugins = enabledPlugins.filter(p => PluginMeta[p]?.userPlugin).length;
         return { totalStockPlugins, totalUserPlugins, enabledStockPlugins, enabledUserPlugins, enabledPlugins };
     }, [settings.plugins]);
     const pluginsToLoad = Math.min(36, plugins.length);
@@ -420,6 +425,7 @@ export default function PluginSettings() {
                                 { label: "Show Zancord", value: SearchStatus.Zancord },
                                 { label: "Show Vencord", value: SearchStatus.VENCORD },
                                 { label: "Show New", value: SearchStatus.NEW },
+                                { label: "Show Remote", value: SearchStatus.REMOTE },
                                 hasUserPlugins && { label: "Show UserPlugins", value: SearchStatus.USER_PLUGINS },
                                 { label: "Show API Plugins", value: SearchStatus.API_PLUGINS },
                             ].filter(isTruthy)}

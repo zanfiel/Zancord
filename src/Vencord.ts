@@ -40,6 +40,7 @@ import { get as dsGet } from "./api/DataStore";
 import { popNotice, showNotice } from "./api/Notices";
 import { NotificationData, showNotification } from "./api/Notifications";
 import { initPluginManager, PMLogger, startAllPlugins } from "./api/PluginManager";
+import { initRemotePlugins } from "./api/RemotePlugins";
 import { PlainSettings, Settings, SettingsStore } from "./api/Settings";
 import { getCloudSettings, putCloudSettings, shouldCloudSync } from "./api/SettingsSync/cloudSync";
 import { localStorage } from "./utils/localStorage";
@@ -205,6 +206,13 @@ function initTrayIpc() {
 
 async function init() {
     await onceReady;
+
+    // Load remote plugins before starting WebpackReady plugins.
+    // Remote plugins are injected into the Plugins registry and will be
+    // picked up by startAllPlugins(). They cannot have patches (those
+    // require compile-time bundling), but can use all other plugin APIs.
+    await initRemotePlugins();
+
     startAllPlugins(StartAt.WebpackReady);
 
     syncSettings();

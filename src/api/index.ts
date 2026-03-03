@@ -32,6 +32,7 @@ import * as $MessageUpdater from "./MessageUpdater";
 import * as $NicknameIcons from "./NicknameIcons";
 import * as $Notices from "./Notices";
 import * as $Notifications from "./Notifications";
+import * as $RemotePlugins from "./RemotePlugins";
 import * as $UserArea from "./UserArea";
 export * as PluginManager from "./PluginManager";
 import * as $ServerList from "./ServerList";
@@ -165,6 +166,12 @@ export const AudioPlayer = $AudioPlayer;
  * An API allowing you to add buttons to the user area panel.
  */
 export const UserArea = $UserArea;
+
+/**
+ * An API for managing remote plugins fetched from the Zancord plugin registry.
+ * Handles downloading, caching, integrity verification, and runtime loading.
+ */
+export const RemotePlugins = $RemotePlugins;
 
 /**
  * Just used to identify if user is on Zancord as Vencord doesn't have this.

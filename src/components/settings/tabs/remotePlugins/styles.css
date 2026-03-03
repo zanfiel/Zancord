@@ -1,0 +1,195 @@
+.vc-remote-plugins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.vc-remote-plugin-card {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid var(--background-modifier-accent);
+    transition: border-color 0.2s ease;
+}
+
+.vc-remote-plugin-card:hover {
+    border-color: var(--brand-500);
+}
+
+.vc-remote-plugin-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.vc-remote-plugin-card-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--header-primary);
+    margin: 0;
+}
+
+.vc-remote-plugin-card-version {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+    background: var(--background-tertiary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.vc-remote-plugin-card-description {
+    font-size: 14px;
+    color: var(--text-normal);
+    margin: 0;
+    line-height: 1.4;
+    flex: 1;
+}
+
+.vc-remote-plugin-card-authors {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+.vc-remote-plugin-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+.vc-remote-plugin-card-tag {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--background-tertiary);
+    padding: 1px 6px;
+    border-radius: 3px;
+}
+
+.vc-remote-plugin-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.vc-remote-plugin-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-remote-plugin-card-status {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.vc-remote-plugin-card-status.installed {
+    color: var(--green-360);
+    background: rgba(35, 165, 90, 0.1);
+}
+
+.vc-remote-plugin-card-status.update-available {
+    color: var(--yellow-300);
+    background: rgba(250, 166, 26, 0.1);
+}
+
+.vc-remote-plugin-card-status.not-installed {
+    color: var(--text-muted);
+}
+
+.vc-remote-plugins-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.vc-remote-plugins-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.vc-remote-plugins-search {
+    margin-bottom: 16px;
+}
+
+.vc-remote-plugins-info-card {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid var(--background-modifier-accent);
+}
+
+.vc-remote-plugins-info-card p {
+    margin: 0;
+    color: var(--text-normal);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.vc-remote-plugins-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.vc-remote-plugins-stat {
+    background: var(--background-secondary);
+    border-radius: 8px;
+    padding: 12px 16px;
+    flex: 1;
+    text-align: center;
+    border: 1px solid var(--background-modifier-accent);
+}
+
+.vc-remote-plugins-stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--header-primary);
+}
+
+.vc-remote-plugins-stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.vc-remote-plugins-empty {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--text-muted);
+}
+
+.vc-remote-plugins-empty p {
+    margin: 8px 0;
+}
+
+.vc-remote-plugins-loading {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--text-muted);
+}
+
+.vc-remote-plugin-changelog {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    padding: 8px;
+    background: var(--background-tertiary);
+    border-radius: 4px;
+    line-height: 1.4;
+}

@@ -159,7 +159,7 @@ export default function PluginModal({ plugin, onRestartNeeded, onClose, transiti
     }
 
     const pluginMeta = PluginMeta[plugin.name];
-    const isZancordPlugin = pluginMeta.folderName.startsWith("src/zancordplugins/") ?? false;
+    const isZancordPlugin = pluginMeta?.folderName?.startsWith("src/zancordplugins/") ?? false;
 
     return (
         <ModalRoot transitionState={transitionState} size={ModalSize.MEDIUM}>

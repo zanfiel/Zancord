@@ -6,6 +6,7 @@
 
 import { showNotice } from "@api/Notices";
 import { isPluginEnabled, pluginRequiresRestart, startDependenciesRecursive, startPlugin, stopPlugin } from "@api/PluginManager";
+import { isRemotePlugin } from "@api/RemotePlugins";
 import { CogWheel, InfoIcon } from "@components/Icons";
 import { AddonCard } from "@components/settings/AddonCard";
 import { classNameFactory } from "@utils/css";
@@ -32,8 +33,9 @@ interface PluginCardProps extends React.HTMLProps<HTMLDivElement> {
 export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, onMouseLeave, isNew }: PluginCardProps) {
     const settings = Settings.plugins[plugin.name];
     const pluginMeta = PluginMeta[plugin.name];
-    const isZancordPlugin = pluginMeta.folderName.startsWith("src/zancordplugins/") ?? false;
-    const isVencordPlugin = pluginMeta.folderName.startsWith("src/plugins/") ?? false;
+    const isRemote = isRemotePlugin(plugin.name);
+    const isZancordPlugin = pluginMeta?.folderName?.startsWith("src/zancordplugins/") ?? false;
+    const isVencordPlugin = pluginMeta?.folderName?.startsWith("src/plugins/") ?? false;
     const isUserPlugin = pluginMeta?.userPlugin ?? false;
     const isModifiedPlugin = plugin.isModified ?? false;
 
@@ -90,6 +92,12 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
     }
 
     const pluginInfo = [
+        {
+            condition: isRemote,
+            src: "https://zancord.org/assets/icons/misc/remote.png",
+            alt: "Remote",
+            title: "Remote Plugin"
+        },
         {
             condition: isModifiedPlugin,
             src: "https://zancord.org/assets/icons/Zancord/modified.png",
