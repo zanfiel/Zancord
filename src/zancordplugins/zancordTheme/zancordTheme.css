@@ -1,0 +1,170 @@
+/*
+ * Zancord Synthwave Cyberpunk Theme
+ * Neon glow effects, scanline overlays, and cyberpunk UI polish
+ */
+
+/* ===== NEON GLOW ON BUTTONS ===== */
+[class*="button_"]:not([class*="lookBlank"]):hover,
+[class*="buttonContainer"] button:hover {
+    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)66,
+                0 0 20px var(--zc-glow, #ff2d95)22;
+    transition: box-shadow 0.3s ease, background-color 0.2s ease;
+}
+
+/* ===== SIDEBAR GLOW INDICATOR ===== */
+[class*="pill_"] [class*="item_"] {
+    background: var(--zc-accent, #ff2d95) !important;
+    box-shadow: 0 0 6px var(--zc-glow, #ff2d95)88;
+}
+
+/* ===== SELECTED CHANNEL GLOW ===== */
+[class*="channel_"][class*="selected_"],
+[class*="link_"][class*="selected_"] {
+    background: var(--zc-accent, #ff2d95)15 !important;
+    border-left: 2px solid var(--zc-accent, #ff2d95);
+    box-shadow: inset 3px 0 12px var(--zc-glow, #ff2d95)15;
+}
+
+/* ===== MESSAGE INPUT GLOW ===== */
+[class*="channelTextArea_"] [class*="inner_"] {
+    border: 1px solid var(--zc-border, #2a1450) !important;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+[class*="channelTextArea_"] [class*="inner_"]:focus-within {
+    border-color: var(--zc-accent, #ff2d95)88 !important;
+    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)33,
+                inset 0 0 8px var(--zc-glow, #ff2d95)11;
+}
+
+/* ===== SCROLLBAR SYNTHWAVE ===== */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--zc-accent, #ff2d95)44;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--zc-accent, #ff2d95)77;
+    box-shadow: 0 0 6px var(--zc-glow, #ff2d95)44;
+}
+
+/* ===== TOOLTIP GLOW ===== */
+[class*="tooltip_"] {
+    border: 1px solid var(--zc-accent, #ff2d95)44;
+    box-shadow: 0 0 12px var(--zc-glow, #ff2d95)22;
+}
+
+/* ===== CONTEXT MENU ===== */
+[class*="menu_"][role="menu"] {
+    border: 1px solid var(--zc-border, #2a1450);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5),
+                0 0 16px var(--zc-glow, #ff2d95)11;
+}
+
+[class*="menu_"] [class*="item_"]:hover:not([class*="disabled_"]) {
+    background: var(--zc-accent, #ff2d95)18 !important;
+}
+
+/* ===== MODAL / POPOUT BORDERS ===== */
+[class*="modal_"][class*="root_"],
+[class*="popout_"][class*="root_"] {
+    border: 1px solid var(--zc-border, #2a1450);
+    box-shadow: 0 0 30px var(--zc-glow, #ff2d95)15,
+                0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+/* ===== MEMBER LIST HOVER ===== */
+[class*="member_"]:hover [class*="layout_"] {
+    background: var(--zc-accent, #ff2d95)10 !important;
+}
+
+/* ===== VOICE CONNECTED GLOW ===== */
+[class*="rtcConnectionStatus_"] [class*="statusGreen_"] {
+    color: var(--zc-accent-secondary, #00f0ff) !important;
+    text-shadow: 0 0 6px var(--zc-glow-secondary, #00f0ff)66;
+}
+
+/* ===== UNREAD BADGE GLOW ===== */
+[class*="numberBadge_"] {
+    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)66;
+}
+
+/* ===== MENTION HIGHLIGHT ===== */
+[class*="mentioned_"] {
+    border-left-color: var(--zc-accent, #ff2d95) !important;
+    background: var(--zc-accent, #ff2d95)10 !important;
+}
+
+/* ===== SERVER FOLDER ICONS ===== */
+[class*="expandedFolderIconWrapper_"] {
+    background: var(--zc-bg-secondary, #120329) !important;
+}
+
+/* ===== HEADER BAR BORDER ===== */
+[class*="title_"][class*="container_"] {
+    border-bottom: 1px solid var(--zc-border, #2a1450);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ===== EMBED ACCENT ===== */
+[class*="embedFull_"] {
+    border-left-color: var(--zc-accent-tertiary, #b429f9) !important;
+    background: var(--zc-bg-tertiary, #0a0118) !important;
+}
+
+/* ===== STATUS INDICATORS ===== */
+[class*="status_"][class*="online_"] rect {
+    fill: var(--zc-accent-secondary, #00f0ff);
+    filter: drop-shadow(0 0 3px var(--zc-glow-secondary, #00f0ff));
+}
+
+/* ===== LINKS ===== */
+a:not([class]) {
+    color: var(--zc-text-link, #00f0ff) !important;
+    text-decoration: none;
+    transition: text-shadow 0.2s ease;
+}
+
+a:not([class]):hover {
+    text-shadow: 0 0 8px var(--zc-glow-secondary, #00f0ff)66;
+}
+
+/* ===== CODE BLOCKS ===== */
+code.inline {
+    background: var(--zc-bg-tertiary, #0a0118) !important;
+    border: 1px solid var(--zc-border, #2a1450);
+}
+
+[class*="codeBlock_"],
+[class*="markup_"] pre {
+    background: var(--zc-bg-deep, #08020e) !important;
+    border: 1px solid var(--zc-border, #2a1450);
+}
+
+/* ===== DIVIDERS ===== */
+[class*="divider_"][class*="hasContent_"] {
+    border-color: var(--zc-border, #2a1450);
+}
+
+[class*="divider_"][class*="hasContent_"] [class*="content_"] {
+    color: var(--zc-text-muted, #8a7bab);
+}
+
+/* ===== SETTINGS SIDEBAR ===== */
+[class*="side_"] [class*="item_"][class*="selected_"] {
+    background: var(--zc-accent, #ff2d95)20 !important;
+    color: var(--zc-accent, #ff2d95) !important;
+}
+
+/* ===== NITRO / UPSELL SUPPRESSION ===== */
+[class*="premiumFeatureBorder_"] {
+    border-color: var(--zc-accent-tertiary, #b429f9) !important;
+}
