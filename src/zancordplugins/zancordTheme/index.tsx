@@ -259,6 +259,7 @@ export default definePlugin({
     authors: [{ name: "Zan", id: 983426436306182144n }],
     description: "Synthwave cyberpunk theme for Zancord",
     enabledByDefault: true,
+    settings,
     startAt: StartAt.DOMContentLoaded,
 
     start() {
