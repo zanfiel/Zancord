@@ -34,7 +34,7 @@ function getArg(name, fallback) {
     return fallback;
 }
 
-const BASE_URL = getArg("base-url", "https://raw.githubusercontent.com/zanfiel/Zancord/main/remote-plugins");
+const BASE_URL = getArg("base-url", "https://plugins.zanverse.lol/bundles");
 const PLUGIN_DIR = getArg("dir", "remote-plugins");
 const MANIFEST_PATH = join(PLUGIN_DIR, "manifest.json");
 
