@@ -16,12 +16,15 @@ import { classes } from "@utils/misc";
 import { React, TextInput, Toasts, useState } from "@webpack/common";
 
 import {
+    autoUpdatePlugins,
     fetchManifest,
+    getAutoUpdate,
     getAvailableUpdates,
     getStore,
     hasUpdate,
     installPlugin,
     isRemotePlugin,
+    setAutoUpdate,
     uninstallPlugin,
     updatePlugin,
 } from "@api/RemotePlugins";
@@ -249,6 +252,23 @@ export default function RemotePluginsTab() {
                     They cannot modify Discord's webpack modules (no patches), but can use all other plugin APIs.
                     Installed plugins are cached locally for offline use.
                 </p>
+            </div>
+
+            <div className="vc-remote-plugins-auto-update">
+                <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer" }}>
+                    <input
+                        type="checkbox"
+                        checked={getAutoUpdate()}
+                        onChange={e => {
+                            setAutoUpdate(e.currentTarget.checked);
+                            refresh();
+                        }}
+                        style={{ width: "18px", height: "18px", accentColor: "var(--brand-experiment)" }}
+                    />
+                    <span style={{ fontSize: "14px", color: "var(--header-secondary)" }}>
+                        Auto-update installed plugins on startup
+                    </span>
+                </label>
             </div>
 
             <div className="vc-remote-plugins-stats">

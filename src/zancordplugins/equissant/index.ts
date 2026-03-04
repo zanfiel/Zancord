@@ -37,7 +37,7 @@ export default definePlugin({
     dependencies: ["AudioPlayerAPI"],
     settings,
     start() {
-        croissant = createAudioPlayer("https://github.com/Zancord/Zancord-Assets/raw/main/sounds/equissant/croissant.mp3", { persistent: true });
+        croissant = createAudioPlayer("https://github.com/Equicord/Equicord-Assets/raw/main/sounds/equissant/croissant.mp3", { persistent: true });
         document.addEventListener("click", play);
     },
     stop() {

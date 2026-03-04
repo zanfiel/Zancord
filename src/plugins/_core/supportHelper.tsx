@@ -103,7 +103,7 @@ export function detectClient(): clientData {
         const isDevBuild = tryOrElse(() => VesktopNative.app.isDevBuild?.(), false);
         const shortHash = equibopGitHash?.slice(0, 7);
         return {
-            name: "Equibop",
+            name: "Zancord Desktop",
             version: VesktopNative.app.getVersion(),
             spoofed: spoofInfo?.spoofed ? `${platformName()} (spoofed from ${spoofInfo.originalPlatform})` : null,
             dev: isDevBuild,
@@ -136,7 +136,7 @@ async function generateDebugInfoMessage() {
     let clientString = `${clientInfo.name}`;
     clientString += `${clientInfo.version ? ` v${clientInfo.version}` : ""}`;
     clientString += `${clientInfo.info ? ` • ${clientInfo.info}` : ""}`;
-    clientString += `${clientInfo.shortHash ? ` • [${clientInfo.shortHash}](<https://github.com/Zancord/Equibop/commit/${clientInfo.hash}>)` : ""}`;
+    clientString += `${clientInfo.shortHash ? ` • [${clientInfo.shortHash}](<https://github.com/zanfiel/Zancord/commit/${clientInfo.hash}>)` : ""}`;
 
     const spoofInfo = IS_EQUIBOP ? tryOrElse(() => VesktopNative.app.getPlatformSpoofInfo?.(), null) : null;
     const platformDisplay = spoofInfo?.spoofed
@@ -145,7 +145,7 @@ async function generateDebugInfoMessage() {
 
     const info = {
         Zancord:
-            `v${VERSION} • [${gitHashShort}](<https://github.com/Zancord/Zancord/commit/${gitHash}>)` +
+            `v${VERSION} • [${gitHashShort}](<https://github.com/zanfiel/Zancord/commit/${gitHash}>)` +
             `${IS_EQUIBOP ? "" : SettingsPlugin.getVersionInfo()} - ${Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(BUILD_TIMESTAMP)}`,
         Client: `${RELEASE_CHANNEL} ~ ${clientString}`,
         Platform: platformDisplay
@@ -171,7 +171,7 @@ async function generateDebugInfoMessage() {
         "Activity Sharing Disabled": tryOrElse(() => !ShowCurrentGame.getSetting(), false),
         "Link Embeds Disabled": tryOrElse(() => !ShowEmbeds.getSetting(), false),
         "Zancord DevBuild": !IS_STANDALONE,
-        "Equibop DevBuild": IS_EQUIBOP && tryOrElse(() => VesktopNative.app.isDevBuild?.(), false),
+        "Zancord Desktop DevBuild": IS_EQUIBOP && tryOrElse(() => VesktopNative.app.isDevBuild?.(), false),
         "Platform Spoofed": spoofInfo?.spoofed ?? false,
         "Has UserPlugins": Object.values(PluginMeta).some(m => m.userPlugin),
         ">2 Weeks Outdated": BUILD_TIMESTAMP < Date.now() - 12096e5,
@@ -372,7 +372,7 @@ export default definePlugin({
                     body: <div>
                         <Paragraph>You are using an externally updated Zancord version, the ability to help you here may be limited.</Paragraph>
                         <Paragraph className={Margins.top8}>
-                            Please join the <Link href="https://zancord.org/discord">Zancord Server</Link> for support,
+                            Please join the <Link href="https://github.com/zanfiel/Zancord">Zancord Server</Link> for support,
                             or if this issue persists on Vencord, continue on.
                         </Paragraph>
                     </div>
@@ -387,7 +387,7 @@ export default definePlugin({
 
                         <Paragraph className={Margins.top8}>
                             We only provide support for <Link href="https://github.com/Zancord/Zancord">official builds</Link>.
-                            Either <Link href="https://github.com/Zancord/Zancord-Installer">switch to an official build</Link> or figure your issue out yourself.
+                            Either <Link href="https://github.com/zanfiel/Zancord">switch to an official build</Link> or figure your issue out yourself.
                         </Paragraph>
 
                         <BaseText size="md" weight="bold" className={Margins.top8}>You will be banned from receiving support if you ignore this rule.</BaseText>

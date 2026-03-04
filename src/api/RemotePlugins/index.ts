@@ -29,6 +29,7 @@ let store: RemotePluginStore = {
     manifest: null,
     lastManifestFetch: 0,
     installed: {},
+    autoUpdate: true,
 };
 
 let initialized = false;
@@ -464,6 +465,52 @@ export function getAvailableUpdates(): RemotePluginManifestEntry[] {
 }
 
 // -------------------------------------------------------------------
+
+/**
+ * Set auto-update preference.
+ */
+export async function setAutoUpdate(enabled: boolean): Promise<void> {
+    store.autoUpdate = enabled;
+    await saveStore();
+}
+
+/**
+ * Get auto-update preference.
+ */
+export function getAutoUpdate(): boolean {
+    return store.autoUpdate;
+}
+
+/**
+ * Run auto-update for all installed plugins.
+ * Returns the list of plugin names that were updated.
+ */
+export async function autoUpdatePlugins(): Promise<string[]> {
+    const manifest = await fetchManifest(true);
+    if (!manifest) return [];
+
+    const updates = getAvailableUpdates();
+    if (updates.length === 0) return [];
+
+    const updated: string[] = [];
+    for (const entry of updates) {
+        try {
+            const success = await updatePlugin(entry);
+            if (success) {
+                updated.push(`${entry.name} v${entry.version}`);
+            }
+        } catch (e) {
+            logger.error(`Auto-update failed for ${entry.name}`, e);
+        }
+    }
+
+    if (updated.length > 0) {
+        logger.info(`Auto-updated ${updated.length} plugin(s): ${updated.join(", ")}`);
+    }
+
+    return updated;
+}
+
 // Initialization (called during Zancord boot)
 // -------------------------------------------------------------------
 
@@ -506,8 +553,24 @@ export async function initRemotePlugins(): Promise<void> {
             logger.info(`Loaded ${loadedCount} remote plugin(s) from cache`);
         }
 
-        // Fetch manifest in background (don't block boot)
-        fetchManifest().catch(e => {
+        // Fetch manifest and auto-update in background (don't block boot)
+        fetchManifest().then(async () => {
+            if (store.autoUpdate) {
+                try {
+                    const updated = await autoUpdatePlugins();
+                    if (updated.length > 0) {
+                        const { showNotification } = await import("@api/Notifications");
+                        showNotification({
+                            title: "Remote Plugins Updated",
+                            body: `Updated ${updated.length} plugin(s): ${updated.join(", ")}. Restart recommended.`,
+                            color: "var(--green-360)",
+                        });
+                    }
+                } catch (e) {
+                    logger.warn("Background auto-update failed", e);
+                }
+            }
+        }).catch(e => {
             logger.warn("Background manifest fetch failed", e);
         });
     } catch (e) {

@@ -110,11 +110,11 @@ const enum SearchStatus {
 }
 
 export const ExcludedReasons: Record<"web" | "discordDesktop" | "vesktop" | "equibop" | "desktop" | "dev", string> = {
-    desktop: "Discord Desktop app or Vesktop/Equibop",
+    desktop: "Discord Desktop app or Vesktop/Zancord Desktop",
     discordDesktop: "Discord Desktop app",
-    vesktop: "Vesktop/Equibop apps",
-    equibop: "Vesktop/Equibop apps",
-    web: "Vesktop/Equibop apps & Discord web",
+    vesktop: "Vesktop/Zancord Desktop apps",
+    equibop: "Vesktop/Zancord Desktop apps",
+    web: "Vesktop/Zancord Desktop apps & Discord web",
     dev: "Developer version of Zancord"
 };
 

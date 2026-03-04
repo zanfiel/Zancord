@@ -114,12 +114,12 @@ const settings = definePluginSettings({
     imageLink: {
         description: "URL for the image (button and modal)",
         type: OptionType.STRING,
-        default: "https://zancord.org/assets/plugins/soggy/cat.png",
+        default: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2300FF41'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='12' font-weight='bold' font-family='sans-serif'%3E:3%3C/text%3E%3C/svg%3E",
     },
     songLink: {
         description: "URL for the song to play",
         type: OptionType.STRING,
-        default: "https://github.com/Zancord/Zancord-Assets/raw/main/sounds/soggy/song.mp3?raw=true",
+        default: "https://github.com/Equicord/Equicord-Assets/raw/main/sounds/soggy/song.mp3?raw=true",
         onChange(newValue) {
             assignSong(newValue, settings.store.songVolume * 100);
         },
@@ -127,7 +127,7 @@ const settings = definePluginSettings({
     boopLink: {
         description: "URL for the boop sound",
         type: OptionType.STRING,
-        default: "https://github.com/Zancord/Zancord-Assets/raw/main/sounds/soggy/honk.wav?raw=true",
+        default: "https://github.com/Equicord/Equicord-Assets/raw/main/sounds/soggy/honk.wav?raw=true",
         onChange(newValue) {
             assignBoop(newValue, settings.store.boopVolume * 100);
         }

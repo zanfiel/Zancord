@@ -39,7 +39,7 @@ export const settingVariables = [
     "{ZancordHash} - Zancord build hash (e.g. 123456789)",
     "{ZancordPlatform} - Platform Zancord is running on (e.g. Dev Build)",
     "",
-    "Equibop Specific Variables:",
+    "Zancord Desktop Specific Variables:",
     "{equibopHash} - Equibop build hash (e.g. 123456789)",
     "{equibopPlatform} - Platform Equibop is running on (e.g. Dev Build)",
     "",

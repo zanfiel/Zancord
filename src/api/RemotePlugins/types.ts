@@ -73,6 +73,8 @@ export interface RemotePluginStore {
     lastManifestFetch: number;
     /** Map of installed plugins keyed by name */
     installed: Record<string, InstalledRemotePlugin>;
+    /** Whether to auto-update installed plugins on boot */
+    autoUpdate: boolean;
 }
 
 export const REMOTE_PLUGIN_STORE_KEY = "Zancord_remotePlugins";

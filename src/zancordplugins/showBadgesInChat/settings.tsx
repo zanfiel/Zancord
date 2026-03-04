@@ -93,8 +93,8 @@ export default settings;
 
 const BadgeSettings = () => {
     const [images, setImages] = useState([
-        { src: "https://badge.zancord.org/donor.webp", shown: settings.store.showZancordDonor, title: "Zancord donor badges", key: "ZancordDonor", position: settings.store.ZancordDonorPosition },
-        { src: "https://zancord.org/assets/favicon.png", shown: settings.store.showZancordContributor, title: "Zancord contributor badge", key: "ZancordContributer", position: settings.store.ZancordContributorPosition },
+        { src: "https://badges.vencord.dev/donor.webp", shown: settings.store.showZancordDonor, title: "Zancord donor badges", key: "ZancordDonor", position: settings.store.ZancordDonorPosition },
+        { src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2300FF41'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EZ%3C/text%3E%3C/svg%3E", shown: settings.store.showZancordContributor, title: "Zancord contributor badge", key: "ZancordContributer", position: settings.store.ZancordContributorPosition },
         { src: "https://cdn.discordapp.com/emojis/1026533070955872337.png", shown: settings.store.showVencordDonor, title: "Vencord donor badges", key: "VencordDonor", position: settings.store.VencordDonorPosition },
         { src: "https://cdn.discordapp.com/emojis/1092089799109775453.png", shown: settings.store.showVencordContributor, title: "Vencord contributor badge", key: "VencordContributer", position: settings.store.VencordContributorPosition },
         { src: "https://cdn.discordapp.com/badge-icons/bf01d1073931f921909045f3a39fd264.png", shown: settings.store.showDiscordProfile, title: "Discord profile badges (HypeSquad, Discord Staff, Early Supporter, etc.)", key: "DiscordProfile", position: settings.store.DiscordProfilePosition },

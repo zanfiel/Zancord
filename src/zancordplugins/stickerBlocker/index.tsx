@@ -50,7 +50,7 @@ function blockedComponentRender(sticker) {
 
     if (showGif) {
         elements.push(
-            <img key="gif" src="https://zancord.org/assets/plugins/stickerBlocker/blocked.gif" style={{ width: "160px", borderRadius: "20px" }} />
+            <img key="gif" src="https://raw.githubusercontent.com/Equicord/Equicord-Assets/main/plugins/stickerBlocker/blocked.gif" style={{ width: "160px", borderRadius: "20px" }} />
         );
     }
 

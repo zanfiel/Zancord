@@ -19,12 +19,12 @@ const settings = definePluginSettings({
     imageSource: {
         type: OptionType.STRING,
         description: "Sets the image url of the jumpscare",
-        default: "https://github.com/Zancord/Zancord-Assets/blob/main/icons/jumpscare/troll.gif?raw=true"
+        default: "https://github.com/Equicord/Equicord-Assets/blob/main/icons/jumpscare/troll.gif?raw=true"
     },
     audioSource: {
         type: OptionType.STRING,
         description: "Sets the audio url of the jumpscare",
-        default: "https://github.com/Zancord/Zancord-Assets/raw/main/sounds/jumpscare/trollolol.mp3?raw=true"
+        default: "https://github.com/Equicord/Equicord-Assets/raw/main/sounds/jumpscare/trollolol.mp3?raw=true"
     },
     chance: {
         type: OptionType.NUMBER,

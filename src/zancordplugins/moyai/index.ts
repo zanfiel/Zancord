@@ -51,8 +51,8 @@ interface IVoiceChannelEffectSendEvent {
 }
 
 const MOYAI = "🗿";
-const MOYAI_URL = "https://github.com/Zancord/Zancord-Assets/raw/main/sounds/moyai/moyai.mp3";
-const MOYAI_URL_HD = "https://github.com/Zancord/Zancord-Assets/raw/main/sounds/moyai/moyai.wav";
+const MOYAI_URL = "https://github.com/Equicord/Equicord-Assets/raw/main/sounds/moyai/moyai.mp3";
+const MOYAI_URL_HD = "https://github.com/Equicord/Equicord-Assets/raw/main/sounds/moyai/moyai.wav";
 
 const settings = definePluginSettings({
     volume: {

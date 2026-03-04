@@ -94,31 +94,31 @@ export function PluginCard({ plugin, disabled, onRestartNeeded, onMouseEnter, on
     const pluginInfo = [
         {
             condition: isRemote,
-            src: "https://zancord.org/assets/icons/misc/remote.png",
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%235865F2'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3ER%3C/text%3E%3C/svg%3E",
             alt: "Remote",
             title: "Remote Plugin"
         },
         {
             condition: isModifiedPlugin,
-            src: "https://zancord.org/assets/icons/Zancord/modified.png",
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23ED4245'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EM%3C/text%3E%3C/svg%3E",
             alt: "Modified",
             title: "Modified Vencord Plugin"
         },
         {
             condition: isZancordPlugin,
-            src: "https://zancord.org/assets/favicon.png",
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2300FF41'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EZ%3C/text%3E%3C/svg%3E",
             alt: "Zancord",
             title: "Zancord Plugin"
         },
         {
             condition: isVencordPlugin,
-            src: "https://zancord.org/assets/icons/vencord/icon-light.png",
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF73FA'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EV%3C/text%3E%3C/svg%3E",
             alt: "Vencord",
             title: "Vencord Plugin"
         },
         {
             condition: isUserPlugin,
-            src: "https://zancord.org/assets/icons/misc/userplugin.png",
+            src: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23B9BBBE'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EU%3C/text%3E%3C/svg%3E",
             alt: "User",
             title: "User Plugin"
         }

@@ -2,7 +2,7 @@
 
 Zancord is a community project and welcomes any kind of contribution from anyone!
 
-We have development documentation for new contributors, which can be found at <https://docs.zancord.org>.
+We have development documentation for new contributors, which can be found at <https://github.com/zanfiel/Zancord>.
 
 > [!IMPORTANT]
 > All contributions must follow our [Code of Conduct](./CODE_OF_CONDUCT.md).
@@ -55,5 +55,5 @@ Bug fixes, refactors, and documentation improvements are also highly appreciated
 
 ## Helping the Community
 
-We have an open support channel in our [Discord community](https://zancord.org/discord).
+We have an open support channel in our [Discord community](https://github.com/zanfiel/Zancord).
 Helping out users there is always appreciated! The more, the merrier.

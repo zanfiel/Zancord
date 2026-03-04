@@ -39,11 +39,11 @@ import { Alerts, SearchableSelect, Select, useState } from "@webpack/common";
 const ICON_STYLE: React.CSSProperties = { width: 20, height: 20, borderRadius: 4, verticalAlign: "middle" };
 
 function ZancordIcon() {
-    return <img src="https://zancord.org/assets/favicon.png" alt="Zancord" style={ICON_STYLE} />;
+    return <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%2300FF41'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EZ%3C/text%3E%3C/svg%3E" alt="Zancord" style={ICON_STYLE} />;
 }
 
 function VencordIcon() {
-    return <img src="https://zancord.org/assets/icons/vencord/icon-light.png" alt="Vencord" style={ICON_STYLE} />;
+    return <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23FF73FA'/%3E%3Ctext x='12' y='16.5' text-anchor='middle' fill='white' font-size='14' font-weight='bold' font-family='sans-serif'%3EV%3C/text%3E%3C/svg%3E" alt="Vencord" style={ICON_STYLE} />;
 }
 
 const RefreshIcon = findComponentByCodeLazy("M4 12a8 8 0 0 1 14.93-4H15");
@@ -60,7 +60,7 @@ function validateUrl(url: string) {
 }
 
 const cloudBackendOptions = [
-    { label: "Zancord Cloud", value: "https://cloud.zancord.org/" },
+    { label: "Zancord Cloud", value: "https://api.vencord.dev/" },
     { label: "Vencord Cloud", value: "https://api.vencord.dev/" }
 ];
 
@@ -98,9 +98,9 @@ function CloudTab() {
             </Paragraph>
 
             <Notice.Info className={Margins.bottom16}>
-                We use our own <Link href="https://github.com/Zancord/Equicloud">Equicloud backend</Link> with enhanced features.
-                View our <Link href="https://zancord.org/cloud/policy">privacy policy</Link> to see what we store and how we use your data.
-                Equicloud is BSD 3.0 licensed, so you can self-host if preferred.
+                We use our own <Link href="https://github.com/zanfiel/Zancord">cloud backend</Link> with enhanced features.
+                View our <Link href="https://github.com/zanfiel/Zancord">privacy policy</Link> to see what we store and how we use your data.
+                The cloud backend is BSD 3.0 licensed, so you can self-host if preferred.
             </Notice.Info>
 
             <FormSwitch
