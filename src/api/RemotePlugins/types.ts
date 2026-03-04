@@ -78,5 +78,5 @@ export interface RemotePluginStore {
 }
 
 export const REMOTE_PLUGIN_STORE_KEY = "Zancord_remotePlugins";
-export const DEFAULT_MANIFEST_URL = "https://plugins.zanverse.lol/manifest.json";
+export const DEFAULT_MANIFEST_URL = "https://raw.githubusercontent.com/zanfiel/Zancord/main/remote-plugins/manifest.json";
 export const MANIFEST_CACHE_TTL = 1000 * 60 * 30; // 30 minutes
