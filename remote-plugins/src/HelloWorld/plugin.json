@@ -1,0 +1,9 @@
+{
+    "name": "HelloWorld",
+    "description": "A sample remote plugin that shows a notification on start and adds a toolbox action.",
+    "version": "1.0.0",
+    "authors": ["Zan"],
+    "tags": ["sample", "hello", "demo"],
+    "sourceUrl": "https://github.com/zanfiel/Zancord/blob/main/remote-plugins/src/HelloWorld/index.js",
+    "changelog": "Initial release"
+}
