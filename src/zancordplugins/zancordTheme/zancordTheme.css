@@ -6,23 +6,23 @@
 /* ===== NEON GLOW ON BUTTONS ===== */
 [class*="button_"]:not([class*="lookBlank"]):hover,
 [class*="buttonContainer"] button:hover {
-    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)66,
-                0 0 20px var(--zc-glow, #ff2d95)22;
+    box-shadow: 0 0 8px var(--zc-glow, #00d4ff)66,
+                0 0 20px var(--zc-glow, #00d4ff)22;
     transition: box-shadow 0.3s ease, background-color 0.2s ease;
 }
 
 /* ===== SIDEBAR GLOW INDICATOR ===== */
 [class*="pill_"] [class*="item_"] {
-    background: var(--zc-accent, #ff2d95) !important;
-    box-shadow: 0 0 6px var(--zc-glow, #ff2d95)88;
+    background: var(--zc-accent, #00d4ff) !important;
+    box-shadow: 0 0 6px var(--zc-glow, #00d4ff)88;
 }
 
 /* ===== SELECTED CHANNEL GLOW ===== */
 [class*="channel_"][class*="selected_"],
 [class*="link_"][class*="selected_"] {
-    background: var(--zc-accent, #ff2d95)15 !important;
-    border-left: 2px solid var(--zc-accent, #ff2d95);
-    box-shadow: inset 3px 0 12px var(--zc-glow, #ff2d95)15;
+    background: var(--zc-accent, #00d4ff)15 !important;
+    border-left: 2px solid var(--zc-accent, #00d4ff);
+    box-shadow: inset 3px 0 12px var(--zc-glow, #00d4ff)15;
 }
 
 /* ===== MESSAGE INPUT GLOW ===== */
@@ -32,9 +32,9 @@
 }
 
 [class*="channelTextArea_"] [class*="inner_"]:focus-within {
-    border-color: var(--zc-accent, #ff2d95)88 !important;
-    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)33,
-                inset 0 0 8px var(--zc-glow, #ff2d95)11;
+    border-color: var(--zc-accent, #00d4ff)88 !important;
+    box-shadow: 0 0 8px var(--zc-glow, #00d4ff)33,
+                inset 0 0 8px var(--zc-glow, #00d4ff)11;
 }
 
 /* ===== SCROLLBAR SYNTHWAVE ===== */
@@ -47,60 +47,60 @@
 }
 
 ::-webkit-scrollbar-thumb {
-    background: var(--zc-accent, #ff2d95)44;
+    background: var(--zc-accent, #00d4ff)44;
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--zc-accent, #ff2d95)77;
-    box-shadow: 0 0 6px var(--zc-glow, #ff2d95)44;
+    background: var(--zc-accent, #00d4ff)77;
+    box-shadow: 0 0 6px var(--zc-glow, #00d4ff)44;
 }
 
 /* ===== TOOLTIP GLOW ===== */
 [class*="tooltip_"] {
-    border: 1px solid var(--zc-accent, #ff2d95)44;
-    box-shadow: 0 0 12px var(--zc-glow, #ff2d95)22;
+    border: 1px solid var(--zc-accent, #00d4ff)44;
+    box-shadow: 0 0 12px var(--zc-glow, #00d4ff)22;
 }
 
 /* ===== CONTEXT MENU ===== */
 [class*="menu_"][role="menu"] {
     border: 1px solid var(--zc-border, #2a1450);
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5),
-                0 0 16px var(--zc-glow, #ff2d95)11;
+                0 0 16px var(--zc-glow, #00d4ff)11;
 }
 
 [class*="menu_"] [class*="item_"]:hover:not([class*="disabled_"]) {
-    background: var(--zc-accent, #ff2d95)18 !important;
+    background: var(--zc-accent, #00d4ff)18 !important;
 }
 
 /* ===== MODAL / POPOUT BORDERS ===== */
 [class*="modal_"][class*="root_"],
 [class*="popout_"][class*="root_"] {
     border: 1px solid var(--zc-border, #2a1450);
-    box-shadow: 0 0 30px var(--zc-glow, #ff2d95)15,
+    box-shadow: 0 0 30px var(--zc-glow, #00d4ff)15,
                 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 /* ===== MEMBER LIST HOVER ===== */
 [class*="member_"]:hover [class*="layout_"] {
-    background: var(--zc-accent, #ff2d95)10 !important;
+    background: var(--zc-accent, #00d4ff)10 !important;
 }
 
 /* ===== VOICE CONNECTED GLOW ===== */
 [class*="rtcConnectionStatus_"] [class*="statusGreen_"] {
-    color: var(--zc-accent-secondary, #00f0ff) !important;
-    text-shadow: 0 0 6px var(--zc-glow-secondary, #00f0ff)66;
+    color: var(--zc-accent-secondary, #0088cc) !important;
+    text-shadow: 0 0 6px var(--zc-glow-secondary, #0088cc)66;
 }
 
 /* ===== UNREAD BADGE GLOW ===== */
 [class*="numberBadge_"] {
-    box-shadow: 0 0 8px var(--zc-glow, #ff2d95)66;
+    box-shadow: 0 0 8px var(--zc-glow, #00d4ff)66;
 }
 
 /* ===== MENTION HIGHLIGHT ===== */
 [class*="mentioned_"] {
-    border-left-color: var(--zc-accent, #ff2d95) !important;
-    background: var(--zc-accent, #ff2d95)10 !important;
+    border-left-color: var(--zc-accent, #00d4ff) !important;
+    background: var(--zc-accent, #00d4ff)10 !important;
 }
 
 /* ===== SERVER FOLDER ICONS ===== */
@@ -116,25 +116,25 @@
 
 /* ===== EMBED ACCENT ===== */
 [class*="embedFull_"] {
-    border-left-color: var(--zc-accent-tertiary, #b429f9) !important;
+    border-left-color: var(--zc-accent-tertiary, #4dc9f6) !important;
     background: var(--zc-bg-tertiary, #0a0118) !important;
 }
 
 /* ===== STATUS INDICATORS ===== */
 [class*="status_"][class*="online_"] rect {
-    fill: var(--zc-accent-secondary, #00f0ff);
-    filter: drop-shadow(0 0 3px var(--zc-glow-secondary, #00f0ff));
+    fill: var(--zc-accent-secondary, #0088cc);
+    filter: drop-shadow(0 0 3px var(--zc-glow-secondary, #0088cc));
 }
 
 /* ===== LINKS ===== */
 a:not([class]) {
-    color: var(--zc-text-link, #00f0ff) !important;
+    color: var(--zc-text-link, #0088cc) !important;
     text-decoration: none;
     transition: text-shadow 0.2s ease;
 }
 
 a:not([class]):hover {
-    text-shadow: 0 0 8px var(--zc-glow-secondary, #00f0ff)66;
+    text-shadow: 0 0 8px var(--zc-glow-secondary, #0088cc)66;
 }
 
 /* ===== CODE BLOCKS ===== */
@@ -160,11 +160,11 @@ code.inline {
 
 /* ===== SETTINGS SIDEBAR ===== */
 [class*="side_"] [class*="item_"][class*="selected_"] {
-    background: var(--zc-accent, #ff2d95)20 !important;
-    color: var(--zc-accent, #ff2d95) !important;
+    background: var(--zc-accent, #00d4ff)20 !important;
+    color: var(--zc-accent, #00d4ff) !important;
 }
 
 /* ===== NITRO / UPSELL SUPPRESSION ===== */
 [class*="premiumFeatureBorder_"] {
-    border-color: var(--zc-accent-tertiary, #b429f9) !important;
+    border-color: var(--zc-accent-tertiary, #4dc9f6) !important;
 }

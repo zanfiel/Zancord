@@ -24,7 +24,7 @@ const styleCache: Record<string, HTMLStyleElement | null> = {};
 // -- Synthwave Cyberpunk Palette --
 const palettes = {
     neonNights: {
-        label: "Neon Nights (Default)",
+        label: "Neon Nights",
         bgDeep: "#08020e",
         bgPrimary: "#0d0221",
         bgSecondary: "#120329",
@@ -74,12 +74,29 @@ const palettes = {
         glow: "#ff6b35",
         glowSecondary: "#f72585",
     },
+    deepOcean: {
+        label: "Deep Ocean (Default)",
+        bgDeep: "#020a12",
+        bgPrimary: "#06111d",
+        bgSecondary: "#0a1928",
+        bgTertiary: "#040d16",
+        bgFloating: "#0e2035",
+        accent: "#00d4ff",       // bright cyan
+        accentSecondary: "#0088cc", // deep blue
+        accentTertiary: "#4dc9f6",  // light cyan
+        text: "#d0e8ff",
+        textMuted: "#5a8aaa",
+        textLink: "#00d4ff",
+        border: "#0d2a42",
+        glow: "#00d4ff",
+        glowSecondary: "#0088cc",
+    },
 };
 
 type PaletteKey = keyof typeof palettes;
 
 function getPalette(key: string) {
-    return palettes[key as PaletteKey] ?? palettes.neonNights;
+    return palettes[key as PaletteKey] ?? palettes.deepOcean;
 }
 
 function getOrCreateStyle(id: string) {
@@ -145,7 +162,7 @@ async function getDiscordStyles(): Promise<string> {
 const NEUTRAL_HSL_REGEX = /(--neutral-\d{1,3}?-hsl):.+?([\d.]+?)%;/g;
 
 function applyTheme(paletteKey?: string) {
-    const palette = paletteKey ?? settings.store.palette ?? "neonNights";
+    const palette = paletteKey ?? settings.store.palette ?? "deepOcean";
     const p = getPalette(palette);
     const bg = hexToHSL(p.bgPrimary);
 
@@ -505,14 +522,14 @@ export const settings = definePluginSettings({
         options: Object.entries(palettes).map(([key, p]) => ({
             label: p.label,
             value: key,
-            default: key === "neonNights",
+            default: key === "deepOcean",
         })),
         onChange: () => applyTheme(),
     },
     backgroundImage: {
         type: OptionType.STRING,
         description: "Background image file path or URL (leave empty for solid background)",
-        default: "C:\\Users\\Zan\\Downloads\\the-nightmare-begins-invader-zim-k28rugw8uksktfy4.jpg",
+        default: "https://plugins.zanverse.lol/assets/invader-zim-wallpaper.jpg",
         onChange: () => applyTheme(),
     },
     panelOpacity: {
