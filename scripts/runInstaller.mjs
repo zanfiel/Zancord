@@ -25,7 +25,7 @@ import { Readable } from "stream";
 import { finished } from "stream/promises";
 import { fileURLToPath } from "url";
 
-const BASE_URL = "https://github.com/Zancord/Zancord-Installer/releases/latest/download/";
+const BASE_URL = "https://github.com/zanfiel/Zancord-Installer/releases/latest/download/";
 const INSTALLER_PATH_DARWIN = "Zancord-Installer.app/Contents/MacOS/Zancord-Installer";
 const INSTALLER_APP_DARWIN = "Zancord-Installer.app";
 
@@ -66,7 +66,7 @@ async function ensureBinary() {
 
     const res = await fetch(BASE_URL + filename, {
         headers: {
-            "User-Agent": "Zancord (https://github.com/Zancord/Zancord)",
+            "User-Agent": "Zancord (https://github.com/zanfiel/Zancord)",
             "If-None-Match": etag
         }
     });
