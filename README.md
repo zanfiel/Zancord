@@ -11,6 +11,8 @@ A custom Discord client mod forked from [Equicord](https://github.com/Equicord/E
 
 ## Installing (Dev Build)
 
+https://github.com/zanfiel/Zancord-Installer
+
 ### Prerequisites
 
 - [Git](https://git-scm.com/download)
