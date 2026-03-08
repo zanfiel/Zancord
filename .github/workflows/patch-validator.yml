@@ -1,0 +1,207 @@
+name: Patch Validator
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: "Channel to validate (stable/canary/compare)"
+        required: false
+        default: "compare"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install validator dependencies
+        working-directory: scripts/validate
+        run: npm install
+
+      - name: Check for Discord build changes
+        id: buildcheck
+        run: |
+          # Fetch current Canary build number
+          CANARY_BUILD=$(curl -s 'https://canary.discord.com/app' \
+            -H 'User-Agent: Mozilla/5.0' | \
+            grep -oP '"BUILD_NUMBER":"(\d+)"' | \
+            grep -oP '\d+')
+          
+          STABLE_BUILD=$(curl -s 'https://discord.com/app' \
+            -H 'User-Agent: Mozilla/5.0' | \
+            grep -oP '"BUILD_NUMBER":"(\d+)"' | \
+            grep -oP '\d+')
+          
+          echo "canary_build=$CANARY_BUILD" >> "$GITHUB_OUTPUT"
+          echo "stable_build=$STABLE_BUILD" >> "$GITHUB_OUTPUT"
+          echo "Stable: $STABLE_BUILD, Canary: $CANARY_BUILD"
+
+      - name: Restore build cache
+        uses: actions/cache@v4
+        with:
+          path: scripts/validate/cache
+          key: validator-cache-${{ steps.buildcheck.outputs.stable_build }}-${{ steps.buildcheck.outputs.canary_build }}
+          restore-keys: |
+            validator-cache-
+
+      - name: Run patch validator (compare mode)
+        id: validate
+        working-directory: scripts/validate
+        env:
+          ZANCORD_SRC: ${{ github.workspace }}
+          VALIDATOR_CACHE_DIR: ${{ github.workspace }}/scripts/validate/cache
+        run: |
+          CHANNEL="${{ github.event.inputs.channel || 'compare' }}"
+          
+          if [ "$CHANNEL" = "compare" ]; then
+            ARGS="--compare --json"
+          else
+            ARGS="--$CHANNEL --json"
+          fi
+          
+          # Run validator, capture output (exit code 1 = broken patches, not a failure)
+          set +e
+          OUTPUT=$(node validate.mjs $ARGS 2>&1)
+          EXIT_CODE=$?
+          set -e
+          
+          echo "$OUTPUT" > validation-result.json
+          
+          # Extract key metrics for the summary
+          if [ "$CHANNEL" = "compare" ]; then
+            NEW_BROKEN=$(echo "$OUTPUT" | jq -r '.diff.new_broken_total // 0')
+            FIXED=$(echo "$OUTPUT" | jq -r '.diff.fixed_total // 0')
+            STABLE_WORKING=$(echo "$OUTPUT" | jq -r '.stable.summary.working // 0')
+            CANARY_WORKING=$(echo "$OUTPUT" | jq -r '.canary.summary.working // 0')
+            
+            echo "new_broken=$NEW_BROKEN" >> "$GITHUB_OUTPUT"
+            echo "fixed=$FIXED" >> "$GITHUB_OUTPUT"
+            echo "stable_working=$STABLE_WORKING" >> "$GITHUB_OUTPUT"
+            echo "canary_working=$CANARY_WORKING" >> "$GITHUB_OUTPUT"
+            echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+            
+            echo "### Patch Validation Results" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "| Metric | Stable | Canary |" >> "$GITHUB_STEP_SUMMARY"
+            echo "|--------|--------|--------|" >> "$GITHUB_STEP_SUMMARY"
+            echo "| Working | $STABLE_WORKING | $CANARY_WORKING |" >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "**New breaks on Canary:** $NEW_BROKEN" >> "$GITHUB_STEP_SUMMARY"
+            echo "**Fixed on Canary:** $FIXED" >> "$GITHUB_STEP_SUMMARY"
+            
+            if [ "$NEW_BROKEN" -gt 0 ]; then
+              echo "" >> "$GITHUB_STEP_SUMMARY"
+              echo "### Newly Broken Patches" >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+              echo "$OUTPUT" | jq -r '
+                (.diff.new_broken_finds[]? | "FIND BROKE: \(.plugin):\(.line)"),
+                (.diff.new_broken_matches[]? | "MATCH BROKE: \(.plugin):\(.line)")
+              ' >> "$GITHUB_STEP_SUMMARY"
+              echo '```' >> "$GITHUB_STEP_SUMMARY"
+            fi
+          else
+            WORKING=$(echo "$OUTPUT" | jq -r '.summary.working // 0')
+            BROKEN_FIND=$(echo "$OUTPUT" | jq -r '.summary.broken_find // 0')
+            BROKEN_MATCH=$(echo "$OUTPUT" | jq -r '.summary.broken_match // 0')
+            
+            echo "working=$WORKING" >> "$GITHUB_OUTPUT"
+            echo "broken_find=$BROKEN_FIND" >> "$GITHUB_OUTPUT"
+            echo "broken_match=$BROKEN_MATCH" >> "$GITHUB_OUTPUT"
+            echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send Discord webhook (new breaks)
+        if: steps.validate.outputs.new_broken > 0
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          NEW_BROKEN="${{ steps.validate.outputs.new_broken }}"
+          FIXED="${{ steps.validate.outputs.fixed }}"
+          STABLE_BUILD="${{ steps.buildcheck.outputs.stable_build }}"
+          CANARY_BUILD="${{ steps.buildcheck.outputs.canary_build }}"
+          STABLE_WORKING="${{ steps.validate.outputs.stable_working }}"
+          CANARY_WORKING="${{ steps.validate.outputs.canary_working }}"
+          
+          # Build broken patches list
+          BROKEN_LIST=$(cat scripts/validate/validation-result.json | jq -r '
+            [
+              (.diff.new_broken_finds[]? | "- **FIND BROKE:** `\(.plugin):\(.line)`"),
+              (.diff.new_broken_matches[]? | "- **MATCH BROKE:** `\(.plugin):\(.line)`")
+            ] | join("\n")
+          ')
+          
+          # Escape for JSON
+          BROKEN_LIST_ESCAPED=$(echo "$BROKEN_LIST" | jq -Rs .)
+          
+          PAYLOAD=$(cat <<WEBHOOK_EOF
+          {
+            "embeds": [{
+              "title": "Zancord Patch Breakage Alert",
+              "color": 15158332,
+              "description": "**${NEW_BROKEN} new patch break(s)** detected on Discord Canary!\n\nStable Build: \`${STABLE_BUILD}\`\nCanary Build: \`${CANARY_BUILD}\`\n\nStable: ${STABLE_WORKING} working\nCanary: ${CANARY_WORKING} working\nFixed on Canary: ${FIXED}\n\n**Newly Broken:**\n${BROKEN_LIST}",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "footer": {
+                "text": "Zancord Patch Validator"
+              }
+            }]
+          }
+          WEBHOOK_EOF
+          )
+          
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" \
+              "$DISCORD_WEBHOOK_URL"
+          else
+            echo "DISCORD_WEBHOOK_URL not set, skipping webhook"
+          fi
+
+      - name: Send Discord webhook (all clear)
+        if: steps.validate.outputs.new_broken == '0' && github.event_name == 'workflow_dispatch'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          STABLE_BUILD="${{ steps.buildcheck.outputs.stable_build }}"
+          CANARY_BUILD="${{ steps.buildcheck.outputs.canary_build }}"
+          STABLE_WORKING="${{ steps.validate.outputs.stable_working }}"
+          CANARY_WORKING="${{ steps.validate.outputs.canary_working }}"
+          
+          PAYLOAD=$(cat <<WEBHOOK_EOF
+          {
+            "embeds": [{
+              "title": "Zancord Patch Check - All Clear",
+              "color": 3066993,
+              "description": "No new patch breaks detected.\n\nStable Build: \`${STABLE_BUILD}\` (${STABLE_WORKING} working)\nCanary Build: \`${CANARY_BUILD}\` (${CANARY_WORKING} working)",
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+              "footer": {
+                "text": "Zancord Patch Validator"
+              }
+            }]
+          }
+          WEBHOOK_EOF
+          )
+          
+          if [ -n "$DISCORD_WEBHOOK_URL" ]; then
+            curl -s -o /dev/null -w "%{http_code}" \
+              -H "Content-Type: application/json" \
+              -d "$PAYLOAD" \
+              "$DISCORD_WEBHOOK_URL"
+          else
+            echo "DISCORD_WEBHOOK_URL not set, skipping webhook"
+          fi
+
+      - name: Upload validation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validation-report-${{ steps.buildcheck.outputs.stable_build }}-${{ steps.buildcheck.outputs.canary_build }}
+          path: scripts/validate/validation-result.json
+          retention-days: 30

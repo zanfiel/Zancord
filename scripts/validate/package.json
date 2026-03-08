@@ -1,0 +1,12 @@
+{
+  "name": "zancord-validator",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "validate": "node validate.mjs",
+    "validate:canary": "node validate.mjs --canary"
+  },
+  "dependencies": {
+    "@intrnl/xxhash64": "^0.1.2"
+  }
+}
