@@ -26,8 +26,8 @@ import { finished } from "stream/promises";
 import { fileURLToPath } from "url";
 
 const BASE_URL = "https://github.com/zanfiel/Zancord-Installer/releases/latest/download/";
-const INSTALLER_PATH_DARWIN = "Zancord-Installer.app/Contents/MacOS/Zancord-Installer";
-const INSTALLER_APP_DARWIN = "Zancord-Installer.app";
+const INSTALLER_PATH_DARWIN = "ZancordInstaller.app/Contents/MacOS/ZancordInstaller";
+const INSTALLER_APP_DARWIN = "ZancordInstaller.app";
 
 const BASE_DIR = join(dirname(fileURLToPath(import.meta.url)), "..");
 const FILE_DIR = join(BASE_DIR, "dist", "Installer");
@@ -36,11 +36,11 @@ const ETAG_FILE = join(FILE_DIR, "etag.txt");
 function getFilename() {
     switch (process.platform) {
         case "win32":
-            return "Zancord-InstallerCli.exe";
+            return "ZancordInstallerCli.exe";
         case "darwin":
-            return "Zancord-Installer.MacOS.zip";
+            return "ZancordInstaller.MacOS.zip";
         case "linux":
-            return "Zancord-InstallerCli-linux";
+            return "ZancordInstallerCli-linux";
         default:
             throw new Error("Unsupported platform: " + process.platform);
     }
