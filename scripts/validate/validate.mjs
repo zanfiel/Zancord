@@ -139,97 +139,70 @@ async function downloadBundle(url, cacheKey) {
 // ============================================================
 
 /**
- * Extract module factories from the main webpack bundle.
- * 
- * Strategy: We use vm.runInNewContext to evaluate a modified version of
- * the bundle that captures the __webpack_modules__ object instead of
- * executing the full webpack runtime.
- * 
- * The bundle is: (()=>{ var __webpack_modules__={...}; ...webpack runtime... })();
- * We modify it to capture __webpack_modules__ before the runtime executes.
+ * Extract module factories from a webpack bundle's __webpack_modules__ object.
+ *
+ * Strategy: Use a flat regex to find module boundaries — patterns like
+ * `},123456(` or `},123456:` — and filter to numeric IDs only. Webpack/rspack
+ * module IDs are always numeric (or scientific notation like 367e3). Quoted
+ * string patterns like `"aria-label":` that appear inside nested JSX/HTML
+ * are naturally excluded since they aren't numeric.
+ *
+ * For the main bundle, __webpack_require__ marks the end of the modules object.
+ * For chunks, skipRuntimeDetection=true uses the full code length (chunks are
+ * pre-bounded by extractChunkModules using brace counting).
  */
-function extractModuleFactories(code) {
+function extractModuleFactories(code, { skipRuntimeDetection = false } = {}) {
     const modules = new Map();
-
-    // Strategy: Regex-based boundary detection.
-    // Instead of fragile brace-counting on 15MB of minified JS, we find module
-    // boundaries using the distinctive pattern that separates module factories.
-    //
-    // Discord's webpack (rspack) uses shorthand method syntax:
-    //   { 714694(e,t,n){...}, 983660(e,t,n){...} }
-    //
-    // Module transitions look like: },DIGITS( or },"STRING"( or },DIGITS:
-    // The },ID( pattern is extremely unlikely to appear inside a module factory
-    // because it would mean a } at end of expression followed by a comma and then
-    // a numeric literal used as a function call — which isn't valid JS.
-    //
-    // Approach:
-    // 1. Find all module ID positions using regex on the whole __webpack_modules__ range
-    // 2. Between consecutive IDs, extract the factory source
 
     const modulesStart = code.indexOf("var __webpack_modules__={");
     if (modulesStart === -1) return modules;
 
     const objStart = modulesStart + "var __webpack_modules__={".length;
-    
-    // Find the webpack runtime start (marks end of __webpack_modules__)
-    // The runtime starts with var __webpack_module_cache__ or uses __webpack_modules__[
-    // In rspack, look for the pattern after the closing } of __webpack_modules__
-    // We know __webpack_require__ starts around position 15.4M
-    const runtimeMarker = code.indexOf("__webpack_require__", objStart);
-    const searchEnd = runtimeMarker !== -1 ? runtimeMarker : code.length;
 
-    // Find all module boundaries.
-    // Pattern: at start of object, or after }, find: ID( or ID:
-    // ID can be: digits, digits with scientific notation (367e3), or quoted string
-    // We use a regex that matches the boundary pattern.
-    //
-    // First module starts right at objStart: ID(
-    // Subsequent modules are after },  : },ID(
-    const boundaryRegex = /(?:^|},?)(\d+(?:e\d+)?|"[^"]*"|'[^']*')(\(|:)/g;
-    
-    // We need to search in the region from objStart to searchEnd
-    // But running regex on a 15MB substring is fine
-    const region = code.substring(objStart, searchEnd);
-    
-    // Collect all module positions
-    const modulePositions = [];
-    let m;
-    while ((m = boundaryRegex.exec(region)) !== null) {
-        const id = m[1].replace(/^["']|["']$/g, ""); // strip quotes if any
-        const idStartInRegion = m.index + m[0].length - m[1].length - m[2].length;
-        const absPos = objStart + m.index;
-        modulePositions.push({
-            id,
-            // The factory source starts at the ID itself
-            sourceStart: objStart + idStartInRegion,
-            matchEnd: objStart + m.index + m[0].length,
-        });
+    let searchEnd;
+    if (skipRuntimeDetection) {
+        searchEnd = code.length;
+    } else {
+        const runtimeMarker = code.indexOf("__webpack_require__", objStart);
+        searchEnd = runtimeMarker !== -1 ? runtimeMarker : code.length;
     }
 
-    // Now extract module sources between consecutive boundaries
-    for (let idx = 0; idx < modulePositions.length; idx++) {
-        const curr = modulePositions[idx];
-        // The factory source runs from the ID start to just before the next module's ID
-        // (or to the end of __webpack_modules__)
+    // Extract the module region and find boundaries using flat regex.
+    // Only match numeric module IDs (digits, optional scientific notation).
+    // Pattern: start-of-string or "},", followed by numeric ID, followed by ( or :
+    const moduleRegion = code.substring(objStart, searchEnd);
+    const boundaryRegex = /(?:^|},?)(\d+(?:e\d+)?)(\(|:)/g;
+
+    const boundaries = []; // { id, idStart } — idStart is absolute position in code
+    const seenIds = new Set();
+    let m;
+    while ((m = boundaryRegex.exec(moduleRegion)) !== null) {
+        const id = m[1];
+        // Keep only the first occurrence of each ID.
+        // Duplicate IDs are false positives from inside nested module code
+        // (e.g. a numeric label followed by : at a deeper brace depth).
+        if (seenIds.has(id)) continue;
+        seenIds.add(id);
+
+        // Calculate where the ID starts in the full code string
+        const idStartInMatch = m[0].length - m[1].length - m[2].length;
+        const idStart = m.index + objStart + idStartInMatch;
+        boundaries.push({ id, idStart });
+    }
+
+    // Extract module sources between consecutive boundaries
+    for (let i = 0; i < boundaries.length; i++) {
+        const curr = boundaries[i];
         let endPos;
-        if (idx + 1 < modulePositions.length) {
-            // Find the }, before the next module ID
-            endPos = modulePositions[idx + 1].sourceStart;
-            // Back up past the comma and closing brace
-            while (endPos > curr.sourceStart && code.charCodeAt(endPos - 1) !== 125 /* } */) endPos--;
-            if (endPos > curr.sourceStart) endPos; // endPos is now at the } + 1
+        if (i + 1 < boundaries.length) {
+            endPos = boundaries[i + 1].idStart;
+            // Walk back past comma to the closing }
+            while (endPos > curr.idStart && code.charCodeAt(endPos - 1) !== 125 /* } */) endPos--;
         } else {
-            // Last module — find its closing } before the ; or end
-            // The __webpack_modules__ object ends with };
+            // Last module ends at searchEnd
             endPos = searchEnd;
-            // Walk back to find the closing }
-            let p = searchEnd - 1;
-            while (p > curr.sourceStart && code.charCodeAt(p) !== 125) p--;
-            endPos = p + 1; // include the }
         }
-        
-        const src = code.substring(curr.sourceStart, endPos);
+        const src = code.substring(curr.idStart, endPos);
         if (src.length > 0) {
             modules.set(curr.id, src);
         }
@@ -261,11 +234,52 @@ function extractChunkModules(code) {
     
     if (i >= code.length) return new Map();
     
-    // Now extract modules from position i (which is {)
-    // Reuse the same brace-tracking logic from extractModuleFactories
-    // but starting from this position
-    const fakeCode = "var __webpack_modules__=" + code.substring(i);
-    return extractModuleFactories(fakeCode);
+    // Find the end of the modules object using brace counting.
+    // We can't use __webpack_require__ as an end marker here because some
+    // module factories contain that literal string, which would prematurely
+    // cut off extraction. Chunk files are small enough for brace counting.
+    let braceDepth = 0;
+    let j = i;
+    let inString = false;
+    let stringChar = 0;
+    let escaped = false;
+    while (j < code.length) {
+        const ch = code.charCodeAt(j);
+        if (escaped) {
+            escaped = false;
+            j++;
+            continue;
+        }
+        if (ch === 92 /* \ */ && inString) {
+            escaped = true;
+            j++;
+            continue;
+        }
+        if (inString) {
+            if (ch === stringChar) inString = false;
+            j++;
+            continue;
+        }
+        // Not in string
+        if (ch === 34 /* " */ || ch === 39 /* ' */ || ch === 96 /* ` */) {
+            inString = true;
+            stringChar = ch;
+        } else if (ch === 123 /* { */) {
+            braceDepth++;
+        } else if (ch === 125 /* } */) {
+            braceDepth--;
+            if (braceDepth === 0) {
+                // Found the matching } for the modules object
+                break;
+            }
+        }
+        j++;
+    }
+    
+    // Extract only the modules object (from { to matching })
+    const modulesObj = code.substring(i, j + 1);
+    const fakeCode = "var __webpack_modules__=" + modulesObj;
+    return extractModuleFactories(fakeCode, { skipRuntimeDetection: true });
 }
 
 /**
@@ -420,16 +434,132 @@ function extractPatchesFromSource(filePath, content) {
         }
     }
     
+    // Detect ...["str1","str2"].map(find => ({find, replacement: ...})) spread patterns
+    // These create multiple patches from an array of find strings with shared replacements.
+    // The parser above misses them because the `find` is a shorthand property (not `find: "value"`).
+    const spreadMapRe = /\.\.\.\[([\s\S]*?)\]\.map\(\s*(\w+)\s*=>/g;
+    let sm;
+    while ((sm = spreadMapRe.exec(content)) !== null) {
+        const arrayContent = sm[1];
+        const arrayStartInContent = sm.index + 4; // after "...[" to start of array content
+
+        // Find the map body by balancing braces after "=> ({"
+        const afterArrow = content.substring(sm.index + sm[0].length);
+        const bodyOpenMatch = afterArrow.match(/\s*\(\{/);
+        if (!bodyOpenMatch) continue;
+
+        const bodyContentStart = sm.index + sm[0].length + bodyOpenMatch.index + bodyOpenMatch[0].length;
+        // Smart brace balancer: skips braces inside strings, regex literals, and comments
+        let braceDepth = 1;
+        let bi = bodyContentStart;
+        while (bi < content.length && braceDepth > 0) {
+            const ch = content[bi];
+            // Skip string literals
+            if (ch === '"' || ch === "'") {
+                bi++;
+                while (bi < content.length && content[bi] !== ch) {
+                    if (content[bi] === '\\') bi++;
+                    bi++;
+                }
+                bi++; // skip closing quote
+                continue;
+            }
+            // Skip template literals
+            if (ch === '`') {
+                bi++;
+                while (bi < content.length && content[bi] !== '`') {
+                    if (content[bi] === '\\') bi++;
+                    bi++;
+                }
+                bi++;
+                continue;
+            }
+            // Skip line comments
+            if (ch === '/' && bi + 1 < content.length && content[bi + 1] === '/') {
+                while (bi < content.length && content[bi] !== '\n') bi++;
+                continue;
+            }
+            // Skip block comments
+            if (ch === '/' && bi + 1 < content.length && content[bi + 1] === '*') {
+                bi += 2;
+                while (bi < content.length && !(content[bi] === '*' && bi + 1 < content.length && content[bi + 1] === '/')) bi++;
+                bi += 2;
+                continue;
+            }
+            // Skip regex literals (heuristic: / preceded by operator-like char)
+            if (ch === '/') {
+                let j = bi - 1;
+                while (j >= bodyContentStart && /\s/.test(content[j])) j--;
+                const prev = j >= bodyContentStart ? content[j] : '';
+                if (prev === '' || /[=(\[,;!&|^~+\-*%<>?:{}\n:]/.test(prev)) {
+                    bi++; // skip opening /
+                    while (bi < content.length && content[bi] !== '/' && content[bi] !== '\n') {
+                        if (content[bi] === '\\') bi++;
+                        bi++;
+                    }
+                    if (bi < content.length && content[bi] === '/') {
+                        bi++; // skip closing /
+                        while (bi < content.length && /[gimsuy]/.test(content[bi])) bi++; // skip flags
+                    }
+                    continue;
+                }
+            }
+            if (ch === '{') braceDepth++;
+            else if (ch === '}') braceDepth--;
+            bi++;
+        }
+        // bi is now right after the closing "}" of the object literal
+        const mapBody = content.substring(bodyContentStart, bi - 1);
+        const mapReplacements = extractReplacements(mapBody);
+        const mapNoWarn = /noWarn\s*:\s*true/.test(mapBody);
+
+        // Parse find strings from the array
+        const strRe = /(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')/g;
+        let strM;
+        while ((strM = strRe.exec(arrayContent)) !== null) {
+            const raw = strM[1] ?? strM[2];
+            const val = raw.replace(/\\"/g, '"').replace(/\\'/g, "'").replace(/\\\\/g, "\\");
+            const posInContent = arrayStartInContent + strM.index;
+            const line = content.substring(0, posInContent).split("\n").length;
+            const canon = canonicalizeMatch(val);
+            findEntries.push({
+                pos: posInContent,
+                find: canon.value,
+                findType: "string",
+                hasIntl: canon.hasIntl,
+                line,
+                noWarn: mapNoWarn,
+                _preExtracted: mapReplacements,
+            });
+        }
+    }
+
     // Sort by position so we can use consecutive finds as boundaries
     findEntries.sort((a, b) => a.pos - b.pos);
     
     // Second pass: extract match: patterns scoped between consecutive find: positions
     for (let i = 0; i < findEntries.length; i++) {
         const entry = findEntries[i];
-        const scopeStart = entry.pos;
-        const scopeEnd = i + 1 < findEntries.length ? findEntries[i + 1].pos : Math.min(scopeStart + 8000, content.length);
-        const replacements = extractReplacements(content.substring(scopeStart, scopeEnd));
-        
+
+        // Use pre-extracted replacements for spread-map entries, otherwise extract from scope
+        let replacements;
+        if (entry._preExtracted) {
+            replacements = entry._preExtracted;
+        } else {
+            const scopeStart = entry.pos;
+            const scopeEnd = i + 1 < findEntries.length ? findEntries[i + 1].pos : Math.min(scopeStart + 8000, content.length);
+            replacements = extractReplacements(content.substring(scopeStart, scopeEnd));
+        }
+
+        // Detect noWarn: check 300 chars before find: and within scope
+        let noWarn = entry.noWarn || false;
+        if (!noWarn && !entry._preExtracted) {
+            const lookbackStart = Math.max(0, entry.pos - 300);
+            const scopeEnd = i + 1 < findEntries.length ? findEntries[i + 1].pos : Math.min(entry.pos + 8000, content.length);
+            const patchText = content.substring(lookbackStart, scopeEnd);
+            noWarn = /noWarn\s*:\s*true/.test(patchText);
+        }
+
         patches.push({
             plugin: pluginName,
             file: filePath,
@@ -439,6 +569,7 @@ function extractPatchesFromSource(filePath, content) {
             error: entry.error,
             replacements,
             line: entry.line,
+            noWarn,
         });
     }
     
@@ -506,6 +637,7 @@ function validatePatches(modules, patches, buildNumber) {
         working: [],
         broken_find: [],
         broken_match: [],
+        noWarn_skipped: [],
         intl_skipped: [],
         parse_error: [],
         multiple_finds: [],
@@ -530,7 +662,11 @@ function validatePatches(modules, patches, buildNumber) {
         }
 
         if (foundModules.length === 0) {
-            results.broken_find.push(patch);
+            if (patch.noWarn) {
+                results.noWarn_skipped.push(patch);
+            } else {
+                results.broken_find.push(patch);
+            }
             continue;
         }
 
@@ -561,7 +697,11 @@ function validatePatches(modules, patches, buildNumber) {
         if (allWork) {
             results.working.push(patch);
         } else {
-            results.broken_match.push({ ...patch, brokenReplacements: broken });
+            if (patch.noWarn) {
+                results.noWarn_skipped.push({ ...patch, brokenReplacements: broken });
+            } else {
+                results.broken_match.push({ ...patch, brokenReplacements: broken });
+            }
         }
     }
 
@@ -574,7 +714,8 @@ function validatePatches(modules, patches, buildNumber) {
 
 function printReport(results, buildInfo) {
     const total = results.working.length + results.broken_find.length +
-        results.broken_match.length + results.intl_skipped.length + results.parse_error.length;
+        results.broken_match.length + results.noWarn_skipped.length +
+        results.intl_skipped.length + results.parse_error.length;
 
     const pct = (n) => total > 0 ? ((n / total) * 100).toFixed(1) : "0.0";
 
@@ -587,6 +728,7 @@ function printReport(results, buildInfo) {
     console.log(`  WORKING:        ${String(results.working.length).padStart(4)} (${pct(results.working.length)}%)`);
     console.log(`  BROKEN (find):  ${String(results.broken_find.length).padStart(4)} (${pct(results.broken_find.length)}%)  -- module not found`);
     console.log(`  BROKEN (match): ${String(results.broken_match.length).padStart(4)} (${pct(results.broken_match.length)}%)  -- module found, pattern failed`);
+    console.log(`  noWarn (ok):    ${String(results.noWarn_skipped.length).padStart(4)} (${pct(results.noWarn_skipped.length)}%)  -- broken but noWarn: true`);
     console.log(`  INTL SKIPPED:   ${String(results.intl_skipped.length).padStart(4)} (${pct(results.intl_skipped.length)}%)  -- uses intl hash`);
     console.log(`  PARSE ERROR:    ${String(results.parse_error.length).padStart(4)} (${pct(results.parse_error.length)}%)`);
     console.log(`  MULTI-FIND:     ${String(results.multiple_finds.length).padStart(4)}       -- find matched >1 module`);
@@ -618,6 +760,17 @@ function printReport(results, buildInfo) {
                     : `"${String(r.match).substring(0, 60)}"`;
                 console.log(`    broken match: ${ms}${r.error ? ` (${r.error})` : ""}`);
             }
+        }
+    }
+
+    if (results.noWarn_skipped.length > 0) {
+        console.log(`\n  noWarn SKIPPED (broken but silenced):`);
+        console.log(`  ${"─".repeat(60)}`);
+        for (const p of results.noWarn_skipped) {
+            const findStr = typeof p.find === "string"
+                ? `"${p.find.length > 80 ? p.find.substring(0, 80) + "..." : p.find}"`
+                : `/${(p.find.source.length > 80 ? p.find.source.substring(0, 80) + "..." : p.find.source)}/`;
+            console.log(`  ${p.plugin}:${p.line}  find: ${findStr}`);
         }
     }
 
@@ -755,7 +908,8 @@ async function downloadAndExtractModules(channel, stepPrefix) {
  */
 function buildReportObject(results, buildInfo) {
     const total = results.working.length + results.broken_find.length +
-        results.broken_match.length + results.intl_skipped.length + results.parse_error.length;
+        results.broken_match.length + results.noWarn_skipped.length +
+        results.intl_skipped.length + results.parse_error.length;
     return {
         timestamp: new Date().toISOString(),
         channel: buildInfo.channel,
@@ -766,6 +920,7 @@ function buildReportObject(results, buildInfo) {
             working: results.working.length,
             broken_find: results.broken_find.length,
             broken_match: results.broken_match.length,
+            noWarn_skipped: results.noWarn_skipped.length,
             intl_skipped: results.intl_skipped.length,
             parse_error: results.parse_error.length,
             multiple_finds: results.multiple_finds.length,
@@ -781,6 +936,10 @@ function buildReportObject(results, buildInfo) {
                 match: r.match instanceof RegExp ? r.match.source : String(r.match),
                 error: r.error,
             })),
+        })),
+        noWarn_skipped: results.noWarn_skipped.map(p => ({
+            plugin: p.plugin, line: p.line,
+            find: typeof p.find === "string" ? p.find : p.find.source,
         })),
     };
 }

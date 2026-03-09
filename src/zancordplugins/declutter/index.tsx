@@ -178,6 +178,7 @@ export default definePlugin({
         {
             // Username styles and allways show username
             find: ".NITRO_PRIVACY_PERK_BETA_COACHMARK));",
+            noWarn: true,
             replacement: [
                 {
                     match: /displayNameStyles:(\i),/,

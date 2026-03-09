@@ -52,7 +52,7 @@ export default definePlugin({
 
     patches: [
         {
-            find: ".WIDGETS_RTC_UPSELL_COACHMARK),",
+            find: ".WIDGETS_RTC_UPSELL_COACHMARK))",
             replacement: {
                 // react.jsx)(AccountPanel, { ..., showTaglessAccountPanel: blah })
                 match: /(?<=\i\.jsxs?\)\()(\i),{(?=[^}]*?userTag:\i,occluded:)/,

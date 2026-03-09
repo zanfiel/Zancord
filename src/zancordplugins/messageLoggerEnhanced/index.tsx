@@ -270,6 +270,7 @@ export default definePlugin({
         },
         {
             find: ".PREMIUM_REFERRAL&&(",
+            noWarn: true,
             replacement: {
                 match: /deleted:\i\.deleted, editHistory:\i\.editHistory,/,
                 replace: "deleted:$self.getDeleted(...arguments), editHistory:$self.getEdited(...arguments),"

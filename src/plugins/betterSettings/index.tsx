@@ -169,6 +169,7 @@ export default definePlugin({
         },
         { // Settings cog context menu
             find: "#{intl::USER_SETTINGS_ACTIONS_MENU_LABEL}",
+            noWarn: true,
             replacement: [
                 {
                     match: /=\[\];(\i)(?=\.forEach.{0,200}?"logout"===\i.{0,100}?(\i)\.get\(\i\))/,
